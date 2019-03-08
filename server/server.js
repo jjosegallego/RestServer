@@ -1,45 +1,30 @@
+//cargo la configuracion de host y puerto
 require('./config/config');
 
+//se instancian los complementos express y mongoose
 const express = require('express');
+const mongoose = require('mongoose');
+
+//se ejecuta el express 
 const app = express();
 
-
+//configuracion para recibir parametros en el body del servicio
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+//se optienen los api rest
+app.use(require('./routes/usuario'));
 
 
-app.get('/usuario', function(req, res) {
-    res.send('get usuario');
-})
-
-app.post('/usuario', function(req, res) {
-    let body = req.body;
-    if (body.nombre === undefined) {
-        res.status(400).json({
-            ok: false,
-            mensaje: 'Nombre es necesario'
-        });
-    } else {
-        res.json({
-            persona: body
-        });
-    }
-
-})
-
-app.put('/usuario/:idUsuario', function(req, res) {
-    let id = req.params.idUsuario
-    res.json({
-        id: id
+//Conexión con BD
+mongoose.connect(process.env.URLDB, { useNewUrlParser: true, useCreateIndex: true },
+    (err, res) => {
+        if (err) throw err;
+        console.log('Base de datos conectada');
     });
-})
 
-app.delete('/usuario', function(req, res) {
-    res.send('delete usuario');
-})
-
+//se abre socket
 app.listen(process.env.PORT, () => {
     console.log('server is connected');
 })
